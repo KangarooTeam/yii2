@@ -9,6 +9,7 @@ use yii\web\Response;
 use yii\filters\VerbFilter;
 use app\models\LoginForm;
 use app\models\ContactForm;
+use app\models\SignupForm;
 
 class SiteController extends Controller
 {
@@ -125,6 +126,23 @@ class SiteController extends Controller
     {
         return $this->render('about');
     }
+
+    public function actionSignup()
+        {
+            $model = new SignupForm(); // Не забываем добавить в начало файла: use app\models\SignupForm; или заменить 'new SignupForm()' на '\app\models\SignupForm()'
+
+            if ($model->load(Yii::$app->request->post())) { // Если есть, загружаем post данные в модель через родительский метод load класса Model
+                if ($user = $model->signup()) { // Регистрация
+                    if (Yii::$app->getUser()->login($user)) { // Логиним пользователя если регистрация успешна
+                        return $this->goHome(); // Возвращаем на главную страницу
+                    }
+                }
+            }
+
+            return $this->render('signup', [ // Просто рендерим вид если один из if вернул false
+                'model' => $model,
+            ]);
+        }
 
     public function actionSay($target = 'World')
     {
